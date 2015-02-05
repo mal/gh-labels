@@ -1,0 +1,20 @@
+{
+  "name": "gh-labels",
+  "version": "0.0.0",
+  "description": "Configure Organisation Level Issue Labels",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "github",
+    "issues",
+    "labels"
+  ],
+  "author": "Mal Graty",
+  "license": "ISC",
+  "dependencies": {
+    "es6-promise": "^2.0.1",
+    "octonode": "^0.6.14"
+  }
+}
