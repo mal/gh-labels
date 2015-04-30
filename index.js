@@ -9,7 +9,7 @@ var repos = new Promise(function (done) {
 });
 
 var labels = new Promise(function (done) {
-    github.repo('idio/docs').labels(function (err, labels) {
+    github.repo('idio/docs').labels({per_page: 250}, function (err, labels) {
         done(labels.reduce(function (out, label) {
             out[label.name] = label.color;
             return out;
@@ -57,6 +57,7 @@ function update(repo, template, current) {
             case actual: // matches, no op
                 return;
             case undefined: // extra, must delete
+                label.name = encodeURI(label.name)
                 return label.delete(log('delete', repo, label));
             default: // mismatch, needs update
                 return label.update({ color: expect }, log(
@@ -70,7 +71,7 @@ function update(repo, template, current) {
         repo.label({
             name: label,
             color: template[label]
-        }, log('create', repo));
+        }, log('create', repo, {name: label}));
     });
 }
 
@@ -81,7 +82,7 @@ Promise.all([repos, labels])
 
             repo = github.repo(repo.full_name);
 
-            repo.labels(function (err, labels) {
+            repo.labels({per_page: 250}, function (err, labels) {
                 update(repo, template, labels);
             });
         });
