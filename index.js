@@ -34,6 +34,7 @@ function log(action, repo, label, delta) {
             message += ': ' + delta.join(' -> ');
 
         console.log(message);
+        if (err) console.log(err.body);
     };
 }
 
