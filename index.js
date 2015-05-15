@@ -1,3 +1,8 @@
+if (!process.env.GITHUB_TOKEN) {
+    console.log('Need GH token');
+    process.exit(1);
+}
+
 var github = require('octonode').client(process.env.GITHUB_TOKEN);
 var Promise = require('es6-promise').Promise;
 
