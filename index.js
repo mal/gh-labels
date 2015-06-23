@@ -1,20 +1,33 @@
 if (!process.env.GITHUB_TOKEN) {
-    console.log('Need GH token');
+    console.log('Need GH token (GITHUB_TOKEN)');
+    process.exit(1);
+}
+
+if (!process.env.GITHUB_ORG) {
+    console.log('Need GH organisation (GITHUB_ORG)');
+    process.exit(1);
+}
+
+if (!process.env.GITHUB_LABEL_MASTER) {
+    console.log('Need GH label master repo (GITHUB_LABEL_MASTER)');
     process.exit(1);
 }
 
 var github = require('octonode').client(process.env.GITHUB_TOKEN);
 var Promise = require('es6-promise').Promise;
 
+var org = process.env.GITHUB_ORG;
+var seed = process.env.GITHUB_LABEL_MASTER;
+
 var repos = new Promise(function (done) {
-    github.org('idio').repos({ per_page: 100 }, function (err, repos) {
+    github.org(org).repos({ per_page: 100 }, function (err, repos) {
         if (err) throw err;
         done(repos);
     });
 });
 
 var labels = new Promise(function (done) {
-    github.repo('idio/docs').labels({per_page: 250}, function (err, labels) {
+    github.repo(seed).labels({per_page: 250}, function (err, labels) {
         done(labels.reduce(function (out, label) {
             out[label.name] = label.color;
             return out;
@@ -84,7 +97,7 @@ function update(repo, template, current) {
 Promise.all([repos, labels])
     .then(splat(function (repos, template) {
         repos.forEach(function (repo) {
-            if (repo.full_name === 'idio/docs') return;
+            if (repo.full_name === seed) return;
 
             repo = github.repo(repo.full_name);
 
