@@ -13,17 +13,34 @@ if (!process.env.GITHUB_LABEL_MASTER) {
     process.exit(1);
 }
 
+var ignore = []
+if (process.env.GITHUB_LABEL_IGNORE) {
+    ignore = process.env.GITHUB_LABEL_IGNORE.split(',')
+}
+
 var github = require('octonode').client(process.env.GITHUB_TOKEN);
 var Promise = require('es6-promise').Promise;
 
 var org = process.env.GITHUB_ORG;
 var seed = process.env.GITHUB_LABEL_MASTER;
 
-var repos = new Promise(function (done) {
-    github.org(org).repos({ per_page: 100 }, function (err, repos) {
-        if (err) throw err;
-        done(repos);
-    });
+ignore.push(seed)
+
+var repos = Promise.all([
+    new Promise(function (done) {
+        github.org(org).repos({ page: 1, per_page: 100 }, function (err, repos) {
+            if (err) throw err;
+            done(repos);
+        });
+    }),
+    new Promise(function (done) {
+        github.org(org).repos({ page: 2, per_page: 100 }, function (err, repos) {
+            if (err) throw err;
+            done(repos);
+        });
+    })
+]).then(function (pages) {
+  return pages.shift().concat(...pages);
 });
 
 var labels = new Promise(function (done) {
@@ -97,7 +114,7 @@ function update(repo, template, current) {
 Promise.all([repos, labels])
     .then(splat(function (repos, template) {
         repos.forEach(function (repo) {
-            if (repo.full_name === seed) return;
+            if (~ignore.indexOf(repo.full_name)) return;
 
             repo = github.repo(repo.full_name);
 
