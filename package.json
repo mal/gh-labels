@@ -1,6 +1,6 @@
 {
   "name": "gh-labels",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Configure Organisation Level Issue Labels",
   "main": "index.js",
   "scripts": {

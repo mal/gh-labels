@@ -113,7 +113,7 @@ function update(repo, template, current) {
 
 Promise.all([repos, labels])
     .then(splat(function (repos, template) {
-        repos.forEach(function (repo) {
+        repos.filter(r => !r.archived).forEach(function (repo) {
             if (~ignore.indexOf(repo.full_name)) return;
 
             repo = github.repo(repo.full_name);
